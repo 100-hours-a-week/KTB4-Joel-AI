@@ -9,3 +9,12 @@
 - pip freeze > requirements.txt 
 -  pip install -r requirements.txt
 
+### 한글 깨짐 문제
+- FastAPI는 기본적으로 JSON 응답을 UTF-8로 내려주기 때문에 한글이 깨진다면 보통 보는 쪽의 인코딩 문제
+- Python 객체 → JSON 직렬화 → UTF-8 인코딩 → application/json 헤더 설정
+- 내장 브라우저에서는 dict list
+
+
+### Extras
+- fastapi dev (vs. uvicorn main:app --reload)
+    - FastAPI 공식 CLI, 자동으로 app이라는 fastapi 인스턴스 찾아서 실행, reload 옵션 default
