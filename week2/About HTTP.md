@@ -26,6 +26,7 @@
 ### Context Manager
 - 리소스의 할당과 해제를 자동으로 처리해주는 객체
 - e.g., with open('file.txt', 'w') as f:
+- e.g., @contextmanager + generator
 
 ### 예외 처리
 - 응답 200이 아닌 경우에 대한 대처
