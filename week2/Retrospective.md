@@ -30,6 +30,25 @@
 - e.g., Depends(get_session)
 - API 엔드포인트에 필요한 외부 객체나 로직을 자동으로 주입
 
+### Summary
+- summaries.py(summarize_post_api(), 라우터) -> summary_service.py(summarize_post(), 서비스) -> summarizer(summarize(), 실제 llm api)
+
+### Project Structure
+main.py
+app/
+ ├─ routers/
+ │   ├─ posts.py            # 게시글/댓글 API
+ │   └─ summaries.py        # 요약 API
+ ├─ services/
+ │   └─ summary_service.py  # 요약 비즈니스 로직
+ ├─ ai/
+ │   ├─ summarizer.py       # 실제 추론
+ │   └─ prompt.py           # 프롬프트 생성
+ ├─ schemas.py              # 요청/응답 DTO
+ ├─ database.py             # SQLite 연결, DB 테이블 생성, Session 제공
+ └─ models.py               # 실제 DB 테이블 모델
+
 ### Extras
 - "fastapi dev" (vs."uvicorn main:app --reload")
     - FastAPI 공식 CLI, 자동으로 app이라는 fastapi 인스턴스 찾아서 실행, reload 옵션 default
+
