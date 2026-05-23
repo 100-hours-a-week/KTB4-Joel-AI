@@ -34,6 +34,7 @@
 - summaries.py(summarize_post_api(), 라우터) -> summary_service.py(summarize_post(), 서비스) -> summarizer(summarize(), 실제 llm api)
 
 ### Project Structure
+```
 main.py
 app/
  ├─ routers/
@@ -47,6 +48,8 @@ app/
  ├─ schemas.py              # 요청/응답 DTO
  ├─ database.py             # SQLite 연결, DB 테이블 생성, Session 제공
  └─ models.py               # 실제 DB 테이블 모델
+```
+
 
 ### Extras
 - "fastapi dev" (vs."uvicorn main:app --reload")
