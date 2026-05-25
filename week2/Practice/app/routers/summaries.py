@@ -12,5 +12,3 @@ router = APIRouter(prefix="/summaries", tags=["summaries"])
 @router.post("/posts/{post_id}", response_model=SummaryRead)
 def summarize_post_api(post_id: int, session: Session = Depends(get_session)):
     return summarize_post(post_id, session)
-
-

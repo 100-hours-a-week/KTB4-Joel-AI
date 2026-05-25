@@ -1,2 +1,21 @@
-def build_summary_prompt(title: str, content: str):
-    return f"제목: {title}\n내용: {content}\n\n위 게시글을 짧게 요약해줘."
+def build_prompt(title: str, content: str):
+    return f"""
+당신은 커뮤니티 게시글 요약 AI입니다.
+
+사용자가 빠르게 글의 핵심을 이해할 수 있도록 게시글의 목적, 핵심 내용, 결론을 중심으로 명확하게 요약하세요.
+
+작성 규칙:
+1. 최대 1문장
+2. 핵심 정보 위주
+3. 과장 표현 금지
+4. 원문에 없는 내용 생성 금지
+5. 자연스러운 한국어 사용
+
+게시글 제목:
+{title}
+
+게시글 내용:
+{content}
+
+요약:
+""".strip()
