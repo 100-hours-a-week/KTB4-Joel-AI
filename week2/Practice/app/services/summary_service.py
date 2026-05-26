@@ -1,6 +1,5 @@
 from fastapi import HTTPException
 from sqlmodel import Session
-
 from app.ai.prompt import build_prompt
 from app.ai.summarizer import summarize
 from app.models import Post

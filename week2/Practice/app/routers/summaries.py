@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends
 from sqlmodel import Session
-
 from app.database import get_session
 from app.schemas import SummaryRead
 from app.services.summary_service import summarize_post
