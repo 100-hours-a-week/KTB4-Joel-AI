@@ -25,7 +25,7 @@
 - context manager(with Session)로 DB session open
 - generator(yield session)로 열린 session을 밖으로 던지고, 함수는 freeze = 세션은 열린 채로 유지
 - 세션 사용(API 함수) 완료되면 함수 wake up, session close, db 연결 닫힘
-
+    
 ### Dependency Injection
 - e.g., Depends(get_session)
 - API 엔드포인트에 필요한 외부 객체나 로직을 자동으로 주입
