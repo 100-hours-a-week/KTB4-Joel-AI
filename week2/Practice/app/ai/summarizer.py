@@ -25,8 +25,7 @@ def summarize(prompt: str):
     print(f"[DEBUG] AI_PROVIDER={provider}")
 
     if provider == "ollama":
-        return provider, summarize_with_ollama(prompt)
-    
+        return provider, summarize_with_ollama(prompt) 
     raise HTTPException(
         status_code=400, 
         detail=f"지원하지 않는 AI 제공자(Provider)입니다: '{provider}'." 

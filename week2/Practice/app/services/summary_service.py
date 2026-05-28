@@ -8,7 +8,6 @@ from app.schemas import SummaryRead
 
 def summarize_post(post_id: int, session: Session):
     post = session.get(Post, post_id)
-
     if post is None:
         raise HTTPException(status_code=404, detail="Post not found")
 

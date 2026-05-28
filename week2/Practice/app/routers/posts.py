@@ -32,10 +32,8 @@ def read_posts(session: Session = Depends(get_session)):
 @router.get("/{post_id}", response_model=PostRead)
 def read_post(post_id: int, session: Session = Depends(get_session)):
     post = session.get(Post, post_id)
-
     if post is None:
         raise HTTPException(status_code=404, detail="Post not found")
-
     post.view_count += 1
     session.add(post)
     session.commit()
@@ -50,15 +48,13 @@ def update_post(
     session: Session = Depends(get_session),
 ):
     post = session.get(Post, post_id)
-
     if post is None:
         raise HTTPException(status_code=404, detail="Post not found")
-
+    
     update_data = post_update.model_dump(exclude_unset=True)
-
     if not update_data:
         raise HTTPException(status_code=400, detail="No fields to update")
-
+    
     post.sqlmodel_update(update_data)
     session.add(post)
     session.commit()
@@ -69,7 +65,6 @@ def update_post(
 @router.delete("/{post_id}", status_code=204)
 def delete_post(post_id: int, session: Session = Depends(get_session)):
     post = session.get(Post, post_id)
-
     if post is None:
         raise HTTPException(status_code=404, detail="Post not found")
 
@@ -88,13 +83,11 @@ def create_comment(
     session: Session = Depends(get_session),
 ):
     post = session.get(Post, post_id)
-
     if post is None:
         raise HTTPException(status_code=404, detail="Post not found")
 
     comment = Comment.model_validate(comment_create, update={"post_id": post_id})
     post.comment_count += 1
-
     session.add(comment)
     session.add(post)
     session.commit()
@@ -105,7 +98,6 @@ def create_comment(
 @router.get("/{post_id}/comments", response_model=list[CommentRead])
 def read_comments(post_id: int, session: Session = Depends(get_session)):
     post = session.get(Post, post_id)
-
     if post is None:
         raise HTTPException(status_code=404, detail="Post not found")
 
@@ -121,12 +113,10 @@ def update_comment(
     session: Session = Depends(get_session),
 ):
     comment = session.get(Comment, comment_id)
-
     if comment is None:
         raise HTTPException(status_code=404, detail="Comment not found")
 
     update_data = comment_update.model_dump(exclude_unset=True)
-
     if not update_data:
         raise HTTPException(status_code=400, detail="No fields to update")
 
@@ -140,7 +130,6 @@ def update_comment(
 @router.delete("/comments/{comment_id}", status_code=204)
 def delete_comment(comment_id: int, session: Session = Depends(get_session)):
     comment = session.get(Comment, comment_id)
-
     if comment is None:
         raise HTTPException(status_code=404, detail="Comment not found")
 
