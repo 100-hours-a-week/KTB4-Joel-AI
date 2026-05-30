@@ -40,34 +40,26 @@ df = pd.DataFrame(data)
 df['총점'] = df['국어'] + df['영어'] + df['수학']
 print(df[df['총점'] >= 250])
 
-
 print("\n===============================================================\n")
 
+print("0. data를 pandas DataFrame으로 만들기")
+population_df = pd.read_csv(
+    "https://ourworldindata.org/grapher/population.csv?v=1&csvType=full&useColumnShortNames=true",
+    storage_options={"User-Agent": "Our World In Data data fetch/1.0"},
+) # 58824 * 4
 
-# 1. Groupby 사용하기
-sales_data = {
-    "name": ["Alice", "Bob", "Charlie", "Daisy", "Evan", "Fiona"],
-    "department": ["Sales", "Sales", "Marketing", "Marketing", "IT", "IT"],
-    "month": ["Jan", "Jan", "Jan", "Feb", "Feb", "Feb"],
-    "sales": [120, 90, 150, 200, 80, 130],
-}
+country_df = population_df[population_df["code"].str.len() == 3].copy() # 국가 데이터 == ISO 3자리
+latest_population_df = country_df[country_df["year"] == country_df["year"].max()].copy() # 가장 최근 연도의 정보
+top10_countries = latest_population_df.sort_values(by="population_historical", ascending=False).head(10) # 가장 최근 연도에서 상위 10개국
+print(top10_countries)
+top10_all_years = country_df[country_df["entity"].isin(top10_countries["entity"])].copy() # 상위 10개국의 "모든 연도" 데이터
 
-sales_df = pd.DataFrame(sales_data)
-print(sales_df)
+print("\n1. Groupby 사용하기")
+print("\nTop 10 국가의 역사상 최대 인구수:")
+max_pop = top10_all_years.groupby("entity")["population_historical"].max()
+print(max_pop)
 
-print("\n**Total sales by department**")
-print(sales_df.groupby("department")["sales"].sum())
-
-print("\n**Average sales by department**")
-print(sales_df.groupby("department")["sales"].mean())
-
-
-print("\n===============================================================\n")
-
-
-# 2. 특정 조건으로 Filtering 사용하기
-print("\n**Person whose sales >= 100")
-print(sales_df[sales_df["sales"] >= 100])
-
-print("\nPerson whose department == IT")
-print(sales_df[sales_df["department"] == "IT"])
+print("\n2. 특정 조건으로 Filtering 사용하기")
+print("\n한국 since 2000")
+korea_df = country_df[(country_df["code"] == "KOR") & (country_df["year"] >= 2000)]
+print(korea_df)

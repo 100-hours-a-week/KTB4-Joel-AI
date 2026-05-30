@@ -3,43 +3,23 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 
-
-# 1. Matplotlib으로 간단한 선 그래프 그리기
-months = ["Jan", "Feb", "Mar", "Apr", "May"]
-sales = [120, 150, 130, 180, 210]
-
-plt.figure(figsize=(8, 4))
-plt.plot(months, sales, marker="o", color="royalblue")
-plt.title("Monthly Sales")
-plt.xlabel("Month")
-plt.ylabel("Sales")
-plt.grid(True, alpha=0.3)
-plt.tight_layout()
-plt.show()
-
-
-
-# %%
-# 2. Seaborn으로 DataFrame 기반 막대 그래프 그리기
-score_data = {
-    "student": ["Minji", "Jisoo", "Daniel", "Hana", "Leo"],
-    "subject": ["Python", "Python", "Data", "Data", "Python"],
-    "score": [95, 72, 88, 64, 81],
+# 샘플 데이터프레임을 생성한 후, 데이터의 기본 정보를 출력하는 코드를 작성하세요.
+data = {
+    '이름': ['김철수', '이영희', '박민수', '최지현', '홍길동'],
+    '나이': [25, 30, 35, 28, 40],
+    '직업': ['개발자', '마케터', '개발자', '디자이너', 'CEO'],
+    '연봉': [4000, 3500, 5000, 4200, 10000],
+    '가입일': ['2020-05-21', '2019-07-15', '2021-01-10', '2018-11-03', '2017-09-27']
 }
 
-score_df = pd.DataFrame(score_data)
+df = pd.DataFrame(data)
+print(df.info())
 
-plt.figure(figsize=(8, 4))
-sns.barplot(data=score_df, x="student", y="score", hue="subject")
-plt.title("Student Scores")
-plt.xlabel("Student")
-plt.ylabel("Score")
-plt.ylim(0, 100)
-plt.tight_layout()
-plt.show()
-plt.close()
+# 샘플 데이터에서 나이가 30 이상이고 연봉이 5000 이하인 사람들만 필터링하는 코드를 작성하세요.
+print(df[(df["나이"] >= 30) & (df["연봉"] <= 5000)])
 
-
-print("Saved seaborn_bar_chart.png")
-
+#샘플 데이터에서 가입 연도가 2019년 이전인 사람들을 찾아 연봉을 10% 인상한 후, 전체 평균 연봉을 계산하는 코드를 작성하세요.
+df['가입일'] = pd.to_datetime(df['가입일'])
+df.loc[df['가입일'].dt.year < 2019, "연봉"] *= 1.10
+print(df['연봉'].mean())
 # %%
