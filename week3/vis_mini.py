@@ -9,6 +9,7 @@ from matplotlib_venn import venn2
 import numpy as np
 import pandas as pd
 import seaborn as sns
+from scipy import stats
 
 
 # 샘플 데이터프레임을 생성한 후, 데이터의 기본 정보를 출력하는 코드를 작성하세요.
@@ -364,7 +365,7 @@ print("\n25===============================================================\n")
 tips = sns.load_dataset("tips")
 print(tips)
 
-plt.figure(figsize=(7, 5))
+plt.figure(figsize=(8, 6))
 sns.scatterplot(x="total_bill", y="tip", data=tips, color="blue")
 plt.title("Scatter Plot: Total Bill vs. Tip")
 plt.xlabel("Total Bill ($)")
@@ -377,7 +378,7 @@ plt.show()
 tips = sns.load_dataset("tips")
 
 male_tips = tips[tips['sex'] == 'Male']
-plt.figure(figsize=(7, 5))
+plt.figure(figsize=(8, 6))
 sns.regplot(x="total_bill", y="tip", data=tips, scatter_kws={'alpha':0.5}, line_kws={'color':'red'})
 plt.title("Regression Line: Total Bill vs. Tip")
 plt.xlabel("Total Bill ($)")
@@ -402,7 +403,7 @@ date_range = pd.date_range(start="2023-01-01", periods=100, freq="D")  # 100일�
 values = np.cumsum(np.random.randn(100))  # 랜덤 값의 누적합
 
 df = pd.DataFrame({"Date": date_range, "Value": values})
-plt.figure(figsize=(10, 5))  # 그래프 크기 설정
+plt.figure(figsize=(8, 6))  # 그래프 크기 설정
 sns.lineplot(x="Date", y="Value", data=df, color="blue", marker="o")  # 시계열 선 그래프
 plt.xlabel("Date")  # X축 라벨 설정
 plt.ylabel("Value")  # Y축 라벨 설정
@@ -414,7 +415,7 @@ plt.show()  # 그래프 출력
 # 1번 퀘스트에서 생성한 데이터를 기반으로 7일 이동 평균을 계산하고, 원본 데이터와 함께 그래프로 비교하는 코드를 작성하세요.
 # 시계열 데이터 생성
 df["Moving_Avg"] = df["Value"].rolling(window=7).mean()
-plt.figure(figsize=(10, 5))
+plt.figure(figsize=(8, 6))
 sns.lineplot(x="Date", y="Value", data=df, label="Original Data", color="gray")
 sns.lineplot(x="Date", y="Moving_Avg", data=df, label="7-Day Moving Average", color="red") 
 plt.xlabel("Date")
@@ -435,7 +436,7 @@ lower_bound = Q1 - k * IQR  # 하한선
 upper_bound = Q3 + k * IQR  # 상한선
 df["Outlier"] = (df["Value"] < lower_bound) | (df["Value"] > upper_bound)
 outliers = df[df["Outlier"]]
-plt.figure(figsize=(10, 5))
+plt.figure(figsize=(8, 6))
 sns.lineplot(x="Date", y="Value", data=df, label="Original Data", color="blue")
 sns.scatterplot(x="Date", y="Value", data=outliers, color="red", label="Outliers", s=100)
 plt.xlabel("Date")
@@ -462,13 +463,13 @@ print(df_resampled)
 # 3시간 간격으로 생성된 시계열 데이터에서 1시간 단위로 업샘플링한 후, 선형 보간(linear)을 적용하는 코드를 작성하세요.
 # 3시간 간격의 시계열 데이터 생성
 date_rng = pd.date_range(start="2024-01-01", end="2024-01-03", freq="3h")
+
 df_hourly = df.resample("h").asfreq() 
 print(df_hourly.head().reset_index())
 df_hourly_interp = df_hourly.interpolate(method="linear") 
 print(df_hourly_interp.head().reset_index())
 
 print("\n31===============================================================\n")
-# %%
 # 주어진 시계열 데이터에서 7일 단순 이동평균(SMA) 을 계산하여 새로운 컬럼을 추가하는 코드를 작성하세요.
 # 샘플 시계열 데이터 생성
 date_rng = pd.date_range(start="2024-01-01", end="2024-01-20", freq="D")
@@ -476,28 +477,18 @@ df = pd.DataFrame({
     "datetime": date_rng,
     "value": np.random.randint(50, 150, size=len(date_rng))
 })
+df.set_index("datetime", inplace=True)
+df["SMA_7"] = df["value"].rolling(window=7).mean()
 
 # 시계열 데이터에서 7일 지수 이동평균(EMA) 을 계산하고, 기존 데이터와 비교하여 출력하는 코드를 작성하세요.
-# 샘플 시계열 데이터 생성
-date_rng = pd.date_range(start="2024-01-01", end="2024-01-20", freq="D")
-df = pd.DataFrame({
-    "datetime": date_rng,
-    "value": np.random.randint(50, 150, size=len(date_rng))
-})
+df["EMA_7"] = df["value"].ewm(span=7, adjust=False).mean()
+print(df.reset_index())
 
 # 주어진 시계열 데이터에서 **이동평균을 활용하여 변동성이 큰 날을 탐색하는 코드**를 작성하세요.
 # 7일 단순 이동평균(SMA)과 비교하여 특정 일자의 값이 이동평균보다 ±20% 이상 차이가 나는 경우만 출력하세요.
-
-# 샘플 시계열 데이터 생성
-date_rng = pd.date_range(start="2024-01-01", end="2024-01-20", freq="D")
-df = pd.DataFrame({
-    "datetime": date_rng,
-    "value": np.random.randint(50, 150, size=len(date_rng))
-})
-
+print(df[abs(df["value"] - df["SMA_7"]) / df["SMA_7"] >= 0.2].dropna(subset=["SMA_7"]))
 
 print("\n33===============================================================\n")
-
 # 샘플 금융 데이터프레임을 직접 생성한 후, 데이터의 기본 정보(행 개수, 열 개수, 데이터 타입 등)를 출력하는 코드를 작성하세요.
 # 샘플 금융 데이터 생성
 data = {
@@ -508,6 +499,8 @@ data = {
     'Close': [101, 104, 106, 105, 109, 108, 111, 113, 116, 119],
     'Volume': [1000, 1200, 1500, 1300, 1600, 1400, 1700, 1800, 1900, 2000]
 }
+df = pd.DataFrame(data)
+# print(df.info())
 
 # 주어진 df 데이터프레임에서 5일 이동평균(SMA)과 5일 지수 이동평균(EMA)을 계산하는 코드를 작성하세요.
 # 샘플 금융 데이터 생성
@@ -516,22 +509,183 @@ data = {
     'Close': [101, 104, 106, 105, 109, 108, 111, 113, 116, 119]
 }
 
+df["SMA_5"] = df["Close"].rolling(window=5).mean()
+df["EMA_5"] = df["Close"].ewm(span=5, adjust=False).mean()
+# print(df.reset_index())
+
 # df 데이터프레임에서 주간(7일) 단위로 종가(Close) 평균을 리샘플링한 후, 이를 바탕으로 주간 변동성(표준편차)을 계산하는 코드를 작성하세요.
 # 샘플 금융 데이터 생성 (30일치)
 date_rng = pd.date_range(start='2024-01-01', periods=30, freq='D')
 close_prices = np.random.uniform(100, 200, size=len(date_rng))  # 100~200 사이의 랜덤 종가 생성
+df = pd.DataFrame({'Date': date_rng, 'Close': close_prices})
 
+df.set_index('Date', inplace=True)
+weekly_summary = df['Close'].resample('7D').agg(['mean', 'std'])
+print(weekly_summary.reset_index())
 
 print("\n36===============================================================\n")
+# 평균 60, 표준 편차 15를 갖는 정규 분포에서 500개의 데이터를 생성한 후, 데이터의 기본 통계 정보(평균, 표준 편차, 최소값, 최대값)를 출력하는 코드를 작성하세요.
+# 평균 60, 표준 편차 15인 정규 분포에서 500개의 난수 생성
+data = np.random.normal(loc=60, scale=15, size=500)
+print(f"평균: {np.mean(data):.2f}, 표준편차: {np.std(data):.2f}, 최소: {np.min(data):.2f}, 최대: {np.max(data):.2f}")
 
+# 평균 50, 표준 편차 10을 갖는 정규 분포에서 특정 값 x=65의 확률 밀도 함수(PDF) 값을 계산하고 출력하는 코드를 작성하세요.
+print(stats.norm.pdf(65, loc=50, scale=10))
+
+# 평균 70, 표준 편차 8을 갖는 정규 분포에서 (1) 특정 값 x=80 이하일 확률을 CDF로 계산하고, (2) 상위 5%에 해당하는 점수를 PPF로 계산하여 출력하는 코드를 작성하세요.
+print(stats.norm.cdf(80, loc=70, scale=8))
+print(stats.norm.ppf(0.95, loc=70, scale=8))
 
 
 print("\n38===============================================================\n")
+# 주어진 데이터에서 평균과 중앙값의 차이를 계산하는 코드를 작성하세요.
+# 샘플 데이터 생성
+np.random.seed(42)
+data = np.random.normal(loc=50, scale=10, size=100)  # 평균 50, 표준편차 10인 정규 분포 데이터 생성
+df = pd.DataFrame(data, columns=["value"])  # 데이터프레임 생성
 
+print(df["value"].mean() - df["value"].median())
+
+# **데이터에서 이상값(Outlier)을 찾아 제거한 후, 원래 데이터와 이상값 제거 후 데이터의 평균을 비교하는 코드**를 작성하세요.
+# 이상값은 **IQR(사분위 범위)를 사용하여 탐지**하세요
+# 샘플 데이터 생성
+np.random.seed(42)
+data = np.random.normal(loc=50, scale=10, size=100)  # 평균 50, 표준편차 10인 정규 분포 데이터 생성
+df = pd.DataFrame(data, columns=["value"])  # 데이터프레임 생성
+
+q1 = np.percentile(df["value"], 25)
+q3 = np.percentile(df["value"], 75)
+iqr = q3 - q1
+df_clean = df[(df["value"] >= q1 - 1.5 * iqr) & (df["value"] <= q3 + 1.5 * iqr)]
+print(df['value'].mean(), df_clean['value'].mean())
+
+# 데이터의 왜도(Skewness)와 첨도(Kurtosis)를 계산하여 데이터의 분포 특성을 분석하는 코드를 작성하세요.
+# 샘플 데이터 생성
+np.random.seed(42)
+data = np.random.normal(loc=50, scale=10, size=100)  # 평균 50, 표준편차 10인 정규 분포 데이터 생성
+df = pd.DataFrame(data, columns=["value"])  # 데이터프레임 생성
+print(df['value'].skew(), df['value'].kurt())
 
 
 print("\n40===============================================================\n")
+# **단일 표본 t-검정(One-Sample t-test)** 을 수행하여 샘플 데이터의 평균이 특정 값과 유의미한 차이가 있는지 검정하는 코드를 작성하세요.
+# (평균 `50`, 표준 편차 `5`를 따르는 정규 분포에서 30개의 데이터를 생성하고, 해당 데이터가 평균 `52`와 차이가 있는지 확인하세요.)
+# 샘플 데이터 생성
+np.random.seed(42)
+sample_data = np.random.normal(loc=50, scale=5, size=30)  # 평균 50, 표준편차 5인 데이터 30개 생성
 
+t_stat, p_value = stats.ttest_1samp(sample_data, popmean=52)
+print(t_stat, p_value)
+
+# 카이제곱 검정(Chi-Square Test) 을 수행하여 관측된 데이터와 기대값이 유의미한 차이가 있는지 확인하는 코드를 작성하세요.
+# 관측된 데이터 (Observed)
+observed = np.array([50, 60, 90])
+# 기대값 (Expected)
+expected = np.array([66, 66, 66]) * (observed.sum() / np.sum([66, 66, 66]))
+
+chi2_stat, p_value = stats.chisquare(f_obs=observed, f_exp=expected)
+print(chi2_stat, p_value)
+
+# 분산 분석(ANOVA, Analysis of Variance) 을 수행하여 여러 그룹의 평균이 서로 다른지 검정하는 코드를 작성하세요
+# 샘플 데이터 생성
+np.random.seed(42)
+group_1 = np.random.normal(loc=50, scale=10, size=30)  # 평균 50, 표준편차 10
+group_2 = np.random.normal(loc=55, scale=10, size=30)  # 평균 55, 표준편차 10
+group_3 = np.random.normal(loc=60, scale=10, size=30)  # 평균 60, 표준편차 10
+
+f_stat, p_value = stats.f_oneway(group_1, group_2, group_3)
+print(f_stat, p_value)
 
 
 print("\n42===============================================================\n")
+# %%
+# NumPy를 사용하여 평균 70, 표준편차 20을 따르는 정규 분포 데이터 1000개를 생성한 후, Matplotlib을 활용하여 박스플롯을 그리는 코드를 작성하세요.
+# 데이터 생성 (평균=70, 표준편차=20인 정규 분포 데이터 1000개)
+np.random.seed(42)
+data = np.random.normal(loc=70, scale=20, size=1000)
+
+df = pd.DataFrame(data, columns=["value"])
+
+plt.figure(figsize=(8, 6))
+plt.boxplot(df["value"], vert=False, patch_artist=True, boxprops=dict(facecolor="lightblue"))
+plt.title("Boxplot of Data Distribution")
+plt.xlabel("Value")
+plt.grid(axis="x", linestyle="--", alpha=0.7)
+plt.show()
+
+# 평균이 각각 55와 60이고, 표준편차가 8인 두 개의 그룹(A, B) 데이터를 생성한 후, **두 그룹의 데이터 분포를 Seaborn을 활용하여 KDE(커널 밀도 함수)와 함께 히스토그램으로 시각화**하세요.
+# 이후, **두 그룹 간 평균 차이가 유의미한지 t-검정을 수행하는 코드**를 작성하세요.
+# 데이터 생성
+np.random.seed(42)
+group_A = np.random.normal(loc=55, scale=8, size=200)  # 평균 55, 표준편차 8
+group_B = np.random.normal(loc=60, scale=8, size=200)  # 평균 60, 표준편차 8
+
+df_A = pd.DataFrame(group_A, columns=["value"])
+df_B = pd.DataFrame(group_B, columns=["value"])
+
+plt.figure(figsize=(8, 6))
+sns.histplot(df_A["value"], bins=30, kde=True, color="skyblue", alpha=0.7)
+sns.histplot(df_B["value"], bins=30, kde=True, color="orange", alpha=0.7)
+plt.title("Histogram with KDE")  
+plt.xlabel("Value")
+plt.ylabel("Density")
+
+t_stat, p_value = stats.ttest_ind(group_A, group_B)
+print(t_stat, p_value)
+
+# 광고 A를 본 500명 중 120명이 클릭하였고, 광고 B를 본 500명 중 150명이 클릭을 한 데이터가 있습니다.
+# 이 데이터를 바탕으로 **카이제곱 검정을 수행하여 광고 A와 B의 클릭률 차이가 유의미한지 분석하고, Seaborn의 barplot을 사용하여 클릭률을 비교하는 그래프를 그리는 코드**를 작성하세요.
+# 데이터 생성 (광고 A와 B의 클릭 여부)
+observed_data = pd.DataFrame({
+    "Ad_A": [120, 380],  # 광고 A 클릭(120명) vs 미클릭(380명)
+    "Ad_B": [150, 350]   # 광고 B 클릭(150명) vs 미클릭(350명)
+}, index=["Click", "No Click"])
+
+chi2_stat, p_value, dof, _ = stats.chi2_contingency(observed_data)
+print(chi2_stat, p_value, dof)
+
+plt.figure(figsize=(6, 5))
+sns.barplot(x=observed_data.columns, y=observed_data.loc["Click"], hue=observed_data.columns, palette=["lightblue", "lightcoral"])
+plt.title("Ad A vs. Ad B - Click Rate")
+plt.xlabel("Advertisement Group")
+plt.ylabel("Number of Clicks")
+plt.show()
+
+
+print("\n[시계열 데이터 시각화]=============================================\n")
+# !pip install yfinance
+import yfinance as yf
+
+tickers = ["AAPL", "MSFT", "GOOGL"]
+raw = yf.download(tickers, period="1y", auto_adjust=True, progress=False, threads=False)
+df_close = raw["Close"].dropna()
+
+# 1) 종가 선 그래프 (matplotlib)
+plt.figure(figsize=(12, 5))
+for col in df_close.columns:
+    plt.plot(df_close.index, df_close[col], label=col)
+plt.title("Stock Closing Prices (1 Year)")
+plt.xlabel("Date")
+plt.ylabel("Price (USD)")
+plt.legend()
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
+
+# 2) AAPL 종가 + 20일/60일 이동평균 (seaborn lineplot)
+aapl = df_close[["AAPL"]].copy()
+aapl["SMA_20"] = aapl["AAPL"].rolling(20).mean()
+aapl["SMA_60"] = aapl["AAPL"].rolling(60).mean()
+aapl = aapl.reset_index()
+
+plt.figure(figsize=(12, 5))
+sns.lineplot(data=aapl, x="Date", y="AAPL",   label="Close",  color="gray",  alpha=0.7)
+sns.lineplot(data=aapl, x="Date", y="SMA_20", label="SMA 20", color="blue")
+sns.lineplot(data=aapl, x="Date", y="SMA_60", label="SMA 60", color="red")
+plt.title("AAPL Close Price with Moving Averages")
+plt.xlabel("Date")
+plt.ylabel("Price (USD)")
+plt.legend()
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
