@@ -1,3 +1,6 @@
 .venv/
-**/__pycache__/
+__pycache__
 *.db
+*.png
+*.toml
+uv.lock
